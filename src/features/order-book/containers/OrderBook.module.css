@@ -1,0 +1,28 @@
+.sidesContainer {
+  display: flex;
+}
+
+.side {
+  width: 50%;
+}
+
+.toggleContainer {
+  padding: 14px 0;
+  text-align: center;
+}
+
+.toggle {
+  padding: 7px 14px;
+  border: none;
+  border-radius: 3px;
+  background-color: var(--blue);
+  color: var(--primary-text-color);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.noData {
+  display: flex;
+  justify-content: center;
+  padding: 14px;
+}

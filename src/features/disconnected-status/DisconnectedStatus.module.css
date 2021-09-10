@@ -1,0 +1,14 @@
+.disconnectedStatus {
+  padding: 14px;
+  text-align: center;
+  background-color: var(--red);
+}
+
+.reconnect {
+  padding: 7px;
+  border: none;
+  color: var(--primary-text-color);
+  font-weight: 600;
+  background: none;
+  cursor: pointer;
+}

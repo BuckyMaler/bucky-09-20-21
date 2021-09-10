@@ -1,0 +1,11 @@
+.panel {
+  border-radius: 3px;
+  background-color: var(--dark-bg-color);
+}
+
+.title {
+  margin: 0;
+  padding: 7px 7px 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
