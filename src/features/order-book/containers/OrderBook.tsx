@@ -52,6 +52,7 @@ function OrderBook() {
     setActiveMarket(
       // @ts-ignore: Type 'undefined' is not assignable to type
       // 'SetStateAction<{ productId: string; displayName: string; }>'.
+      // This will never return undefined.
       Markets.find((market) => market.productId !== activeMarket.productId)
     );
   }

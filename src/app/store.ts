@@ -18,6 +18,9 @@ export const store = configureStore({
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
+      // Objects of type `MessageEvent` aren't serializable. `websocketMessage`
+      // is safe to ignore because it's not used as a case statement for any
+      // reducers.
       serializableCheck: { ignoredActions: [websocketMessage.type] },
     }).concat(sagaMiddleware, websocketMiddleware()),
   enhancers: [

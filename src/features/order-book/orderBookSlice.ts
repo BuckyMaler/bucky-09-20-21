@@ -31,12 +31,12 @@ export interface Order {
 
 const bidsAdapter = createEntityAdapter<Order>({
   selectId: (order) => order.price,
-  sortComparer: (a, b) => b.price - a.price,
+  sortComparer: (a, b) => b.price - a.price, // Descending
 });
 
 const asksAdapter = createEntityAdapter<Order>({
   selectId: (order) => order.price,
-  sortComparer: (a, b) => a.price - b.price,
+  sortComparer: (a, b) => a.price - b.price, // Ascending
 });
 
 const createOrderReducer = (
@@ -56,6 +56,9 @@ const createOrderReducer = (
 
         entityAdapter.setMany(state, setOrders);
         entityAdapter.removeMany(state, removeOrders);
+        // I don't know if the ratio of updates to removals can be
+        // relied on to keep state from constantly growing, so this
+        // prevents the amount of orders from exceeding 100.
         entityAdapter.removeMany(state, state.ids.slice(100));
       })
       .addMatcher(
