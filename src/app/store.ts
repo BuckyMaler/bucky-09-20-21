@@ -23,11 +23,17 @@ export const store = configureStore({
       // reducers.
       serializableCheck: { ignoredActions: [websocketMessage.type] },
     }).concat(sagaMiddleware, websocketMiddleware()),
-  enhancers: [
-    batchedSubscribe(
-      _throttle((notify) => notify(), 350, { leading: false, trailing: true })
-    ),
-  ],
+  enhancers:
+    process.env.NODE_ENV !== 'test'
+      ? [
+          batchedSubscribe(
+            _throttle((notify) => notify(), 350, {
+              leading: false,
+              trailing: true,
+            })
+          ),
+        ]
+      : [],
 });
 
 sagaMiddleware.run(websocketSaga);

@@ -19,6 +19,7 @@ function OrderBookRow(props: Props) {
       className={classNames(styles.orderBookRow, {
         [styles.reverse]: orderType === OrderType.Asks,
       })}
+      data-testid="order-book-row"
     >
       <div>{numeral(orderTotal).format('0,0')}</div>
       <div>{numeral(order.qty).format('0,0')}</div>

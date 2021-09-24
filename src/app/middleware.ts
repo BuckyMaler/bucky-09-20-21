@@ -16,7 +16,11 @@ function websocketMiddleware(): Middleware {
     switch (action.type) {
       case connectWebsocket.type:
         storeAPI.dispatch(websocketConnecting());
-        websocket = new WebSocket('wss://www.cryptofacilities.com/ws/v1');
+        websocket = new WebSocket(
+          process.env.NODE_ENV !== 'test'
+            ? 'wss://www.cryptofacilities.com/ws/v1'
+            : 'ws://localhost:3001'
+        );
         websocket.onopen = () => {
           storeAPI.dispatch(websocketConnected());
         };

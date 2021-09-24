@@ -100,7 +100,11 @@ function OrderBook() {
   }
 
   return (
-    <Panel title={`Order Book - ${activeMarket.displayName}`} maxWidth="800px">
+    <Panel
+      title={`Order Book - ${activeMarket.displayName}`}
+      maxWidth="800px"
+      testId="order-book"
+    >
       {content}
     </Panel>
   );

@@ -22,7 +22,7 @@ function OrderBookTable(props: Props) {
   );
 
   return (
-    <div className={styles.orderBookTable}>
+    <div className={styles.orderBookTable} data-testid="order-book-table">
       <div
         className={classNames(styles.tableHead, { [styles.reverse]: isAsks })}
       >

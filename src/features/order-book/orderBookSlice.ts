@@ -109,7 +109,7 @@ export const selectSpread = createSelector(
 
     return {
       difference: topAsk.price - topBid.price,
-      percentage: 100 - (topBid.price / topAsk.price) * 100,
+      percentage: 1 - topBid.price / topAsk.price,
     };
   }
 );
