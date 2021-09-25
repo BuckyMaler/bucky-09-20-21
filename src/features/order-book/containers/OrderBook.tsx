@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Markets, OrderType } from '../constants';
+import { useEffect } from 'react';
+import { OrderType } from '../constants';
 import {
   selectAllAsks,
   selectAllAskTotals,
@@ -10,6 +10,10 @@ import {
 } from '../orderBookSlice';
 import OrderBookSpread from '../components/OrderBookSpread';
 import OrderBookTable from '../components/OrderBookTable';
+import {
+  selectActiveMarket,
+  setActiveMarket,
+} from '../../activeMarket/activeMarketSlice';
 import { Feed, FeedEvent, WebsocketStatus } from '../../websocket/constants';
 import {
   selectFeedEvent,
@@ -17,13 +21,18 @@ import {
   subscribeFeed,
   unsubscribeFeed,
 } from '../../websocket/websocketSlice';
-import { useAppDispatch, useAppSelector } from '../../../app/hooks';
+import {
+  useAppDispatch,
+  useAppSelector,
+  usePrevious,
+} from '../../../app/hooks';
 import Panel from '../../../common/components/Panel';
 import Spinner from '../../../common/components/Spinner';
 import styles from './OrderBook.module.css';
 
 function OrderBook() {
-  const [activeMarket, setActiveMarket] = useState(Markets[0]);
+  const activeMarket = useAppSelector(selectActiveMarket);
+  const prevActiveMarket = usePrevious(activeMarket);
   const websocketStatus = useAppSelector(selectWebsocketStatus);
   const feedEvent = useAppSelector(selectFeedEvent(Feed.Book));
   const bids = useAppSelector(selectAllBids);
@@ -45,24 +54,25 @@ function OrderBook() {
     }
   }, [websocketStatus, feedEvent, activeMarket, dispatch]);
 
-  function handleToggleFeed() {
-    dispatch(
-      unsubscribeFeed({ feed: Feed.Book, productId: activeMarket.productId })
-    );
-    setActiveMarket(
-      // @ts-ignore: Type 'undefined' is not assignable to type
-      // 'SetStateAction<{ productId: string; displayName: string; }>'.
-      // This will never return undefined.
-      Markets.find((market) => market.productId !== activeMarket.productId)
-    );
-  }
+  useEffect(() => {
+    if (
+      prevActiveMarket &&
+      prevActiveMarket.productId !== activeMarket.productId
+    ) {
+      dispatch(
+        unsubscribeFeed({
+          feed: Feed.Book,
+          productId: prevActiveMarket.productId,
+        })
+      );
+    }
+  }, [prevActiveMarket, activeMarket, dispatch]);
 
   let content;
   const websocketDisconnected =
     websocketStatus === WebsocketStatus.Disconnected;
-  const isLoading = feedEvent !== FeedEvent.Subscribed || !snapshotReceived;
 
-  if (websocketDisconnected || isLoading) {
+  if (websocketDisconnected || !snapshotReceived) {
     content = (
       <div className={styles.noData}>
         {websocketDisconnected ? <p>Service disconnected</p> : <Spinner />}
@@ -91,7 +101,10 @@ function OrderBook() {
           </div>
         </div>
         <div className={styles.toggleContainer}>
-          <button className={styles.toggle} onClick={handleToggleFeed}>
+          <button
+            className={styles.toggle}
+            onClick={() => dispatch(setActiveMarket(activeMarket))}
+          >
             Toggle Feed
           </button>
         </div>

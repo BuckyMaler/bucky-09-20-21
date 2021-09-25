@@ -24,3 +24,11 @@ export function useTimeout(callback: () => void, delay: number | null) {
 
   return timeoutRef;
 }
+
+export function usePrevious<T>(value: T) {
+  const ref: MutableRefObject<T | undefined> = useRef();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
+}

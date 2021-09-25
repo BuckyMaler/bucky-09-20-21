@@ -3,41 +3,50 @@ import _throttle from 'lodash.throttle';
 import { batchedSubscribe } from 'redux-batched-subscribe';
 import createSagaMiddleware from 'redux-saga';
 import websocketMiddleware from './middleware';
+import activeMarketReducer from '../features/activeMarket/activeMarketSlice';
 import orderBookReducer from '../features/order-book/orderBookSlice';
 import websocketReducer, {
   websocketSaga,
   websocketMessage,
 } from '../features/websocket/websocketSlice';
 
-const sagaMiddleware = createSagaMiddleware();
+export function initStore() {
+  const sagaMiddleware = createSagaMiddleware();
 
-export const store = configureStore({
-  reducer: {
-    websocket: websocketReducer,
-    orderBook: orderBookReducer,
-  },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      // Objects of type `MessageEvent` aren't serializable. `websocketMessage`
-      // is safe to ignore because it's not used as a case statement for any
-      // reducers.
-      serializableCheck: { ignoredActions: [websocketMessage.type] },
-    }).concat(sagaMiddleware, websocketMiddleware()),
-  enhancers:
-    process.env.NODE_ENV !== 'test'
-      ? [
-          batchedSubscribe(
-            _throttle((notify) => notify(), 350, {
-              leading: false,
-              trailing: true,
-            })
-          ),
-        ]
-      : [],
-});
+  const store = configureStore({
+    reducer: {
+      websocket: websocketReducer,
+      activeMarket: activeMarketReducer,
+      orderBook: orderBookReducer,
+    },
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        // Objects of type `MessageEvent` aren't serializable. `websocketMessage`
+        // is safe to ignore because it's not used as a case statement for any
+        // reducers.
+        serializableCheck: { ignoredActions: [websocketMessage.type] },
+      }).concat(sagaMiddleware, websocketMiddleware()),
+    enhancers:
+      process.env.NODE_ENV !== 'test'
+        ? [
+            batchedSubscribe(
+              _throttle((notify) => notify(), 350, {
+                leading: false,
+                trailing: true,
+              })
+            ),
+          ]
+        : [],
+  });
 
-sagaMiddleware.run(websocketSaga);
+  sagaMiddleware.run(websocketSaga);
 
+  return store;
+}
+
+let store: AppStore;
+
+export type AppStore = ReturnType<typeof initStore>;
 export type AppDispatch = typeof store.dispatch;
 export type RootState = ReturnType<typeof store.getState>;
 export type AppThunk<ReturnType = void> = ThunkAction<

@@ -1,15 +1,17 @@
 import WS from 'jest-websocket-mock';
 import OrderBook from './OrderBook';
-import { Markets } from '../constants';
+import { Markets } from '../../activeMarket/activeMarketSlice';
 import { Feed, FeedEvent } from '../../websocket/constants';
 import { connectWebsocket } from '../../websocket/websocketSlice';
-import { store } from '../../../app/store';
+import { AppStore, initStore } from '../../../app/store';
 import { fireEvent, render, screen, within } from '../../../test-utils';
 
 let ws: WS;
+let store: AppStore;
 
 beforeEach(async () => {
   ws = new WS('ws://localhost:3001', { jsonProtocol: true });
+  store = initStore();
   store.dispatch(connectWebsocket());
   await ws.connected;
 });
@@ -20,7 +22,7 @@ afterEach(() => {
 
 describe('OrderBook', () => {
   test('should load data and switch markets', async () => {
-    render(<OrderBook />);
+    render(<OrderBook />, store);
 
     const orderBook = screen.getByTestId('order-book');
 
@@ -180,7 +182,7 @@ describe('OrderBook', () => {
   });
 
   test('should handle no data', async () => {
-    render(<OrderBook />);
+    render(<OrderBook />, store);
 
     const orderBook = screen.getByTestId('order-book');
 

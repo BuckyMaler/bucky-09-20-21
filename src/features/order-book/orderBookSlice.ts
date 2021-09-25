@@ -7,6 +7,7 @@ import {
   EntityAdapter,
 } from '@reduxjs/toolkit';
 import { OrderType } from './constants';
+import { setActiveMarket } from '../activeMarket/activeMarketSlice';
 import { Feed } from '../websocket/constants';
 import {
   feedUnsubscribed,
@@ -77,8 +78,7 @@ const snapshotReceivedReducer = createReducer(false, (builder) => {
     .addCase(snapshotMessage, () => true)
     .addMatcher(
       (action) =>
-        (action.type === feedUnsubscribed.type &&
-          action.payload === Feed.Book) ||
+        action.type === setActiveMarket.type ||
         action.type === websocketDisconnected.type,
       () => false
     );
