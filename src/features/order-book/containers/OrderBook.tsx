@@ -14,10 +14,9 @@ import {
   selectActiveMarket,
   setActiveMarket,
 } from '../../activeMarket/activeMarketSlice';
-import { Feed, FeedEvent, WebsocketStatus } from '../../websocket/constants';
+import { Feed, FeedEvent } from '../../websocket/constants';
 import {
   selectFeedEvent,
-  selectWebsocketStatus,
   subscribeFeed,
   unsubscribeFeed,
 } from '../../websocket/websocketSlice';
@@ -33,7 +32,6 @@ import styles from './OrderBook.module.css';
 function OrderBook() {
   const activeMarket = useAppSelector(selectActiveMarket);
   const prevActiveMarket = usePrevious(activeMarket);
-  const websocketStatus = useAppSelector(selectWebsocketStatus);
   const feedEvent = useAppSelector(selectFeedEvent(Feed.Book));
   const bids = useAppSelector(selectAllBids);
   const asks = useAppSelector(selectAllAsks);
@@ -44,15 +42,12 @@ function OrderBook() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (
-      websocketStatus === WebsocketStatus.Connected &&
-      feedEvent === FeedEvent.Unsubscribed
-    ) {
+    if (feedEvent === FeedEvent.Unsubscribed) {
       dispatch(
         subscribeFeed({ feed: Feed.Book, productId: activeMarket.productId })
       );
     }
-  }, [websocketStatus, feedEvent, activeMarket, dispatch]);
+  }, [feedEvent, activeMarket, dispatch]);
 
   useEffect(() => {
     if (
@@ -68,57 +63,47 @@ function OrderBook() {
     }
   }, [prevActiveMarket, activeMarket, dispatch]);
 
-  let content;
-  const websocketDisconnected =
-    websocketStatus === WebsocketStatus.Disconnected;
-
-  if (websocketDisconnected || !snapshotReceived) {
-    content = (
-      <div className={styles.noData}>
-        {websocketDisconnected ? <p>Service disconnected</p> : <Spinner />}
-      </div>
-    );
-  } else {
-    content = (
-      <>
-        <OrderBookSpread spread={spread} />
-        <div className={styles.sidesContainer}>
-          <div className={styles.side}>
-            <OrderBookTable
-              orders={bids}
-              bidTotals={bidTotals}
-              askTotals={askTotals}
-              orderType={OrderType.Bids}
-            />
-          </div>
-          <div className={styles.side}>
-            <OrderBookTable
-              orders={asks}
-              askTotals={askTotals}
-              bidTotals={bidTotals}
-              orderType={OrderType.Asks}
-            />
-          </div>
-        </div>
-        <div className={styles.toggleContainer}>
-          <button
-            className={styles.toggle}
-            onClick={() => dispatch(setActiveMarket(activeMarket))}
-          >
-            Toggle Feed
-          </button>
-        </div>
-      </>
-    );
-  }
-
   return (
     <Panel
       title={`Order Book - ${activeMarket.displayName}`}
       maxWidth="800px"
       testId="order-book"
     >
-      {content}
+      {snapshotReceived ? (
+        <>
+          <OrderBookSpread spread={spread} />
+          <div className={styles.sidesContainer}>
+            <div className={styles.side}>
+              <OrderBookTable
+                orders={bids}
+                bidTotals={bidTotals}
+                askTotals={askTotals}
+                orderType={OrderType.Bids}
+              />
+            </div>
+            <div className={styles.side}>
+              <OrderBookTable
+                orders={asks}
+                askTotals={askTotals}
+                bidTotals={bidTotals}
+                orderType={OrderType.Asks}
+              />
+            </div>
+          </div>
+          <div className={styles.toggleContainer}>
+            <button
+              className={styles.toggle}
+              onClick={() => dispatch(setActiveMarket(activeMarket))}
+            >
+              Toggle Feed
+            </button>
+          </div>
+        </>
+      ) : (
+        <div className={styles.noData}>
+          <Spinner />
+        </div>
+      )}
     </Panel>
   );
 }

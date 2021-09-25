@@ -1,7 +1,17 @@
-.disconnectedStatus {
+.app {
   padding: 14px;
-  text-align: center;
-  background-color: var(--red);
+}
+
+.noData {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 14px;
+}
+
+.disconnected {
+  margin: 0;
 }
 
 .reconnect {

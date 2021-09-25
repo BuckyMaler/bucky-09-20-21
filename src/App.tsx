@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { usePageVisibility } from 'react-page-visibility';
 import { useAppDispatch, useAppSelector, useTimeout } from './app/hooks';
-import DisconnectedStatus from './features/disconnected-status/DisconnectedStatus';
+import Spinner from './common/components/Spinner';
 import OrderBook from './features/order-book/containers/OrderBook';
 import { WebsocketStatus } from './features/websocket/constants';
 import {
@@ -9,6 +9,7 @@ import {
   disconnectWebsocket,
   selectWebsocketStatus,
 } from './features/websocket/websocketSlice';
+import styles from './App.module.css';
 
 function App() {
   const websocketStatus = useAppSelector(selectWebsocketStatus);
@@ -28,17 +29,34 @@ function App() {
       : null
   );
 
-  return (
-    <>
-      {websocketStatus === WebsocketStatus.Disconnected && (
-        <DisconnectedStatus
-          handleReconnect={() => dispatch(connectWebsocket())}
-        />
-      )}
-      <div style={{ padding: '14px' }}>
-        <OrderBook />
+  const isLoading =
+    !websocketStatus || websocketStatus === WebsocketStatus.Connecting;
+  const isDisconnected = websocketStatus === WebsocketStatus.Disconnected;
+
+  if (isLoading || isDisconnected) {
+    return (
+      <div className={styles.noData}>
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          <p className={styles.disconnected}>
+            The service is disconnected.{' '}
+            <button
+              className={styles.reconnect}
+              onClick={() => dispatch(connectWebsocket())}
+            >
+              Reconnect
+            </button>
+          </p>
+        )}
       </div>
-    </>
+    );
+  }
+
+  return (
+    <div className={styles.app}>
+      <OrderBook />
+    </div>
   );
 }
 
