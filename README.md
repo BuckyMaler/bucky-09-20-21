@@ -62,13 +62,25 @@ The store is composed of 3 slices of state, 2 middlewares, and an enhancer. The 
     displayName: string;
   };
   orderBook: {
-    entities: {
-      [key: string]: {
-        price: number;
-        qty: number;
+    bids: {
+      entities: {
+        [key: string]: {
+          price: number;
+          qty: number;
+        };
       };
+      ids: Array<number>;
     };
-    ids: Array<number>;
+    asks: {
+      entities: {
+        [key: string]: {
+          price: number;
+          qty: number;
+        };
+      };
+      ids: Array<number>;
+    };
+    snapshotReceived: boolean;
   };
 }
 ```
