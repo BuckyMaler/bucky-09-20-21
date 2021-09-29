@@ -18,7 +18,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 | Users can manually reconnect the websocket            | **Full**    |                                                                                                                                                                                                                                                                   |
 | Re-rendering is variably throttled based on device    | **Partial** | Re-rendering is throttled by a constant [here](https://github.com/BuckyMaler/bucky-09-20-21/blob/master/src/app/store.ts#L24)                                                                                                                                     |
 | Critical flows are tested                             | **Full**    | Integration tests for `OrderBook` are [here](https://github.com/BuckyMaler/bucky-09-20-21/blob/master/src/features/order-book/containers/OrderBook.test.tsx). In a production codebase I'd include more tests.                                                    |
-| The app is publicly hosted                            | **Full**    | [bucky-09-20-21.vercel.app](bucky-09-20-21.vercel.app)                                                                                                                                                                                                            |
+| The app is publicly hosted                            | **Full**    | [bucky-09-20-21.vercel.app](http://bucky-09-20-21.vercel.app/)                                                                                                                                                                                                    |
 
 ### File Structure
 
