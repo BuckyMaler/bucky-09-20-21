@@ -1,7 +1,6 @@
 import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
-import _throttle from 'lodash.throttle';
-import { batchedSubscribe } from 'redux-batched-subscribe';
 import createSagaMiddleware from 'redux-saga';
+import { batchedSubscribe } from './enhancers';
 import websocketMiddleware from './middleware';
 import activeMarketReducer from '../features/activeMarket/activeMarketSlice';
 import orderBookReducer from '../features/order-book/orderBookSlice';
@@ -26,17 +25,7 @@ export function initStore() {
         // reducers.
         serializableCheck: { ignoredActions: [websocketMessage.type] },
       }).concat(sagaMiddleware, websocketMiddleware()),
-    enhancers:
-      process.env.NODE_ENV !== 'test'
-        ? [
-            batchedSubscribe(
-              _throttle((notify) => notify(), 350, {
-                leading: false,
-                trailing: true,
-              })
-            ),
-          ]
-        : [],
+    enhancers: process.env.NODE_ENV !== 'test' ? [batchedSubscribe()] : [],
   });
 
   sagaMiddleware.run(websocketSaga);
